@@ -1,0 +1,46 @@
+# === ESTÁGIO 1: Builder (Compilação da API Go) ===
+FROM golang:1.27-alpine AS builder
+
+RUN apk add --no-cache git ca-certificates tzdata
+
+WORKDIR /app
+
+# Copia dependências do Go
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copia todo o código fonte
+COPY . .
+
+# Compila o binário otimizado
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o api cmd/main.go
+
+# === ESTÁGIO 2: Execução (Produção) ===
+FROM alpine:3.19
+
+# Instala ca-certificates, fusos horários e Node.js/npm (necessário para o npx prisma)
+RUN apk add --no-cache ca-certificates tzdata nodejs npm
+
+WORKDIR /app
+
+# Copia certificados e zonas de fuso horário
+COPY --from=builder /usr/share/zoneinfo /usr/share/zoneinfo
+COPY --from=builder /etc/ssl/certs/ca-certificates.crt /etc/ssl/certs/ca-certificates.crt
+
+# Copia o binário compilado, configurações e a pasta prisma (com o schema e migrations)
+COPY --from=builder /app/api .
+COPY --from=builder /app/configs ./configs
+COPY --from=builder /app/prisma ./prisma
+
+# Copia e dá permissão de execução para o entrypoint
+COPY entrypoint.sh .
+RUN chmod +x entrypoint.sh
+
+RUN mkdir -p /logs && chmod 777 /logs
+
+ENV TZ=America/Recife
+
+EXPOSE 8080
+
+# Executa o script que roda a migration e depois sobe o binário
+CMD ["./entrypoint.sh"]

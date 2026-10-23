@@ -1,0 +1,1 @@
+UPDATE pcdesconto SET apenasplpagmax = 'S' WHERE UPPER(TRIM(descricao)) = 'POLITICA ESCALONADA' AND apenasplpagmax IS NULL
