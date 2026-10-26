@@ -8,12 +8,13 @@ const nextConfig: NextConfig = {
   cacheComponents: true,
   partialPrefetching: true,
   // basePath: "/dev-test",
+  // assetPrefix: "/dev-test",
   basePath: "/escalonada",
   assetPrefix: "/escalonada",
 
   output: "standalone",
 
-  allowedDevOrigins: ['painelcomal.duckdns.org'],
+  allowedDevOrigins: ["painelcomal.duckdns.org"],
   turbopack: {
     rules: {
       "*.css": {
@@ -21,6 +22,16 @@ const nextConfig: NextConfig = {
         as: "*.css",
       },
     },
+  },
+
+  async redirects() {
+    return [
+      {
+        source: "/",
+        destination: "/precificacao",
+        permanent: true,
+      },
+    ];
   },
 };
 

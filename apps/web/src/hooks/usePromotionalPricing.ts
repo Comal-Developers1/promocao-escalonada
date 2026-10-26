@@ -16,7 +16,7 @@ export function usePromotionalPricing() {
   const [selecionado, setSelecionado] = useState<ProductsDTO | null>(null);
   const [valorPromo, setValorPromo] = useState("");
   const [qtdInicio, setQtdInicio] = useState("");
-  const [qtdFim, setQtdFim] = useState("150"); // Valor padrão 150
+  const [qtdFim, setQtdFim] = useState("99999"); // Valor padrão 150
   const [linhas, setLinhas] = useState<LinhaTabela[]>([]);
 
   // Regra: Só libera os filtros se data inicial e final estiverem preenchidas
@@ -45,7 +45,7 @@ export function usePromotionalPricing() {
     if (!promo || promo <= 0) return;
 
     const qInicio = Number(qtdInicio.replace(",", ".")) || 0;
-    const qFim = Number(qtdFim.replace(",", ".")) || 150;
+    const qFim = Number(qtdFim.replace(",", ".")) || 99999;
 
     const novasLinhas: LinhaTabela[] = planos.map((plano) => {
       const valorBaseTabela = getValorTabelaPorNumpr(selecionado, plano.numpr);
@@ -56,7 +56,7 @@ export function usePromotionalPricing() {
         codigo: String(selecionado.codprod),
         descricao: selecionado.descricao,
         valorBase: valorBaseTabela,
-        valorPromocao: promo,
+        valorPromocao:  promo,
         plano: String(plano.codplpag),
         pertxfim: plano.pertxfim || 0,
         valorPlano,
@@ -73,7 +73,7 @@ export function usePromotionalPricing() {
     setSelecionado(null);
     setValorPromo("");
     setQtdInicio("");
-    setQtdFim("150");
+    setQtdFim("99999");
     setAberto(false);
   }
 
