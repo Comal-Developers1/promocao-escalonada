@@ -56,6 +56,8 @@ export function ProductSearchForm({
   adicionarProduto,
 }: ProductSearchFormProps) {
   const inputRef = React.useRef<HTMLInputElement>(null);
+  const promoRef = React.useRef<HTMLInputElement>(null);
+  const qtdInicioRef = React.useRef<HTMLInputElement>(null);
 
   // 1. Restauração ao carregar a página
   React.useEffect(() => {
@@ -117,27 +119,24 @@ export function ProductSearchForm({
     }
   }, [selecionado]);
 
-  // Função para lidar com o clique em "Adicionar Produto" e focar/selecionar o input novamente
   const handleAdicionarProduto = () => {
     adicionarProduto();
 
-    // Pequeno timeout para garantir que os estados de limpeza foram aplicados antes de focar
     setTimeout(() => {
       if (inputRef.current) {
         inputRef.current.focus();
-        inputRef.current.select(); // Seleciona o texto caso ainda haja algo no input
+        inputRef.current.select();
       }
     }, 50);
   };
 
-  // Limpar filtros e localStorage
   const handleLimparFiltros = () => {
     setDataInicio("");
     setDataFim("");
     setTermo("");
     setValorPromo("");
     setQtdInicio("");
-    setQtdFim("9999");
+    setQtdFim("99999");
     if (setSelecionado) setSelecionado(null);
 
     localStorage.removeItem("promo_dataInicio");
@@ -259,7 +258,7 @@ export function ProductSearchForm({
         <div
           className={`grid grid-cols-1 md:grid-cols-2 gap-4 items-end transition-opacity ${!isDatasPreenchidas ? "opacity-50 pointer-events-none" : ""}`}
         >
-          {/* Autocomplete */}
+          {/* Autocomplete de Código */}
           <div className="space-y-1.5 w-full relative">
             <Label htmlFor="codigo">Código do produto</Label>
             <div className="relative w-full">
@@ -274,15 +273,21 @@ export function ProductSearchForm({
                 value={termo}
                 onChange={handleInputChange}
                 onKeyDown={(e) => {
-                  if (e.key === "Tab" && aberto && sugestoes.length > 0) {
-                    e.preventDefault();
-                    const produtoParaSelecionar = sugestoes[0];
-                    if (produtoParaSelecionar) {
-                      selecionarProduto(produtoParaSelecionar);
-                      setTermo(
-                        `${produtoParaSelecionar.codprod} - ${produtoParaSelecionar.descricao}`,
-                      );
-                      setAberto(false);
+                  if (e.key === "Tab" || e.key === "Enter") {
+                    if (aberto && sugestoes.length > 0) {
+                      e.preventDefault();
+                      const produtoParaSelecionar = sugestoes[0];
+                      if (produtoParaSelecionar) {
+                        selecionarProduto(produtoParaSelecionar);
+                        setTermo(
+                          `${produtoParaSelecionar.codprod} - ${produtoParaSelecionar.descricao}`,
+                        );
+                        setAberto(false);
+                      }
+                    } else if (e.key === "Enter") {
+                      // Se o menu estiver fechado e apertar Enter no código, pula para o campo de Valor Promo
+                      e.preventDefault();
+                      promoRef.current?.focus();
                     }
                   }
                 }}
@@ -350,11 +355,12 @@ export function ProductSearchForm({
             />
           </div>
 
-          {/* Demais campos */}
+          {/* Valor de Promoção e Quantidades */}
           <div className="space-y-4 md:col-span-3 grid grid-cols-1 md:grid-cols-4 gap-4">
             <div className="space-y-1.5">
               <Label htmlFor="promo">Valor de Promoção (R$)</Label>
               <Input
+                ref={promoRef}
                 id="promo"
                 inputMode="decimal"
                 placeholder="0,00"
@@ -363,20 +369,41 @@ export function ProductSearchForm({
                 onChange={(e) =>
                   setValorPromo(e.target.value.replace(/[^\d.,]/g, ""))
                 }
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    qtdInicioRef.current?.focus(); // Vai para Qtd. Início ao apertar Enter
+                  }
+                }}
               />
             </div>
 
             <div className="space-y-1.5">
               <Label htmlFor="qtdInicio">Qtd. Início</Label>
               <Input
+                ref={qtdInicioRef}
                 id="qtdInicio"
-                inputMode="numeric"
-                placeholder="0"
+                inputMode="decimal"
+                placeholder="0,0"
                 disabled={!isDatasPreenchidas}
                 value={qtdInicio}
-                onChange={(e) =>
-                  setQtdInicio(e.target.value.replace(/\D/g, ""))
-                }
+                onChange={(e) => {
+                  let val = e.target.value.replace(/[^\d.,]/g, "");
+                  const partes = val.split(/[,.]/);
+                  if (partes.length > 2) {
+                    val = partes[0] + "," + partes.slice(1).join("");
+                  }
+                  setQtdInicio(val);
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    // Se os campos forem válidos, adiciona o produto ao apertar Enter na quantidade!
+                    if (selecionado && valorPromo && qtdInicio) {
+                      handleAdicionarProduto();
+                    }
+                  }
+                }}
               />
             </div>
 

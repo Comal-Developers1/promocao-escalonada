@@ -61,9 +61,16 @@ func (s *TXTService) GenerateAndSaveTXT(usuario string, matricula int, linhas []
 		percenStr := fmt.Sprintf("%.4f", l.PctNecessaria)
 		percenStr = strings.ReplaceAll(percenStr, ".", ",")
 
-		// Mapeamento correto com 31 colunas perfeitamente alinhadas com a imagem
+		// 🟢 Formata a quantidade início com casas decimais (ex: 2 casas) e troca ponto por vírgula
+		qtdInicioStr := fmt.Sprintf("%.2f", l.QtdInicio)
+		qtdInicioStr = strings.ReplaceAll(qtdInicioStr, ".", ",")
+
+		qtdFimStr := fmt.Sprintf("%.2f", l.QtdFim)
+		qtdFimStr = strings.ReplaceAll(qtdFimStr, ".", ",")
+
+		// Mapeamento correto com as variáveis formatadas
 		line := fmt.Sprintf(
-			"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%.0f\t%.0f\t%s\t%s\t%s\t%s\t%s\t%s\n",
+			"%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\n",
 			l.Codigo,  // 1. PRODUTO
 			dataIni,   // 2. INICIO
 			dataFim,   // 3. FIM
@@ -90,8 +97,8 @@ func (s *TXTService) GenerateAndSaveTXT(usuario string, matricula int, linhas []
 			"",  // 24. TIP CARG / DESC REDE
 			"",
 			"",
-			l.QtdInicio,           // 25. QT INICIAL
-			l.QtdFim,              // 26. QT FINAL
+			qtdInicioStr,          // 25. QT INICIAL (Agora formatado como string com decimal)
+			qtdFimStr,             // 26. QT FINAL (Agora formatado como string com decimal)
 			"S",                   // 27. PRIORITARIA
 			"S",                   // 28. PRIORITARIA GERAL
 			"POLITICA ESCALONADA", // 29. DESCRICAO

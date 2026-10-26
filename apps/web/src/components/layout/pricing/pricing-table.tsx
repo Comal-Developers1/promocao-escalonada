@@ -52,16 +52,18 @@ export function PricingTable({
     }));
   };
 
-  // Agrupa as linhas por produtoId
+  // 🟢 Usa Map para PRESERVAR a ordem exata de adição dos produtos
   const groupedRows = React.useMemo(() => {
-    const groups: { [key: number]: LinhaTabela[] } = {};
+    const map = new Map<number, LinhaTabela[]>();
+
     linhas.forEach((linha) => {
-      if (!groups[linha.produtoId]) {
-        groups[linha.produtoId] = [];
+      if (!map.has(linha.produtoId)) {
+        map.set(linha.produtoId, []);
       }
-      groups[linha.produtoId].push(linha);
+      map.get(linha.produtoId)!.push(linha);
     });
-    return groups;
+
+    return map;
   }, [linhas]);
 
   const handleExport = async () => {
@@ -123,7 +125,7 @@ export function PricingTable({
                   Valor base (Tabela)
                 </TableHead>
                 <TableHead className="text-right">Valor promo</TableHead>
-                <TableHead>Plano</TableHead>
+                <TableHead className="text-center">QT. Inicial</TableHead>
                 <TableHead className="text-right">Taxa/Desc. Plano</TableHead>
                 <TableHead className="text-right">Valor no plano</TableHead>
                 <TableHead className="text-right">% p/ atingir promo</TableHead>
@@ -143,13 +145,12 @@ export function PricingTable({
                 </TableRow>
               )}
 
-              {Object.entries(groupedRows).map(([produtoIdStr, items]) => {
-                const produtoId = Number(produtoIdStr);
+              {/* 🟢 Iteração mantendo a ordem sequencial com Map.entries() */}
+              {Array.from(groupedRows.entries()).map(([produtoId, items]) => {
                 const isExpanded = !!expandedProducts[produtoId];
                 const firstItem = items[0];
                 const totalPlanoCount = items.length;
 
-                // Se estiver recolhido, mostra apenas o primeiro plano
                 const itemsToDisplay = isExpanded ? items : [firstItem];
 
                 return (
@@ -200,7 +201,9 @@ export function PricingTable({
                             {fmtBRL(l.valorPromocao)}
                           </TableCell>
 
-                          <TableCell>{l.plano}</TableCell>
+                          <TableCell className="text-center">
+                            {l.qtdInicio}
+                          </TableCell>
 
                           <TableCell className="text-right">
                             <span
@@ -230,9 +233,7 @@ export function PricingTable({
                             >
                               <Percent className="h-3 w-3" />
                               {l.pctNecessaria.toFixed(2).replace(".", ",")}%
-                              {l.pctNecessaria > 0
-                                ? " ↑"
-                                : " ↓"}
+                              {l.pctNecessaria > 0 ? " ↑" : " ↓"}
                             </Badge>
                           </TableCell>
 
