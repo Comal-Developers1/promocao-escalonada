@@ -25,7 +25,7 @@ func (s *service) InitCronJobsUpdateSVC() {
 	cronScheduler := cron.New(cron.WithLocation(time.Local))
 
 	// Exemplo: Executa todo dia à meia-noite ("0 0 * * *")
-	_, err := cronScheduler.AddFunc("*/10 * * * *", func() {
+	_, err := cronScheduler.AddFunc("*/3 * * * *", func() {
 		log.Println("[CRON] Iniciando atualização automática da PCDESCONTO...")
 
 		// Como o cron não tem requisição HTTP, criamos um contexto com timeout de segurança de 5 minutos

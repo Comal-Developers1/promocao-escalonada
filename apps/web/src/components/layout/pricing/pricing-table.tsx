@@ -231,8 +231,8 @@ export function PricingTable({
                               <Percent className="h-3 w-3" />
                               {l.pctNecessaria.toFixed(2).replace(".", ",")}%
                               {l.pctNecessaria > 0
-                                ? " ↑ acréscimo"
-                                : " ↓ desconto"}
+                                ? " ↑"
+                                : " ↓"}
                             </Badge>
                           </TableCell>
 
