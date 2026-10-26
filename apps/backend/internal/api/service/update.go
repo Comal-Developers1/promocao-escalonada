@@ -22,21 +22,23 @@ func (s *service) UpdateManual(c context.Context) error {
 }
 
 func (s *service) InitCronJobsUpdateSVC() {
-	cronScheduler := cron.New(cron.WithLocation(time.Local))
+	cronScheduler := cron.New(
+		cron.WithLocation(time.Local),
+		cron.WithSeconds(),
+	)
+	
+	_, err := cronScheduler.AddFunc("@every 10s", func() {
+		log.Println("[CRON] Verificando registros pendentes para atualização da PCDESCONTO...")
 
-	// Exemplo: Executa todo dia à meia-noite ("0 0 * * *")
-	_, err := cronScheduler.AddFunc("*/3 * * * *", func() {
-		log.Println("[CRON] Iniciando atualização automática da PCDESCONTO...")
-
-		// Como o cron não tem requisição HTTP, criamos um contexto com timeout de segurança de 5 minutos
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+		// 🟢 3. Timeout ajustado para 10 segundos (compatível com o intervalo de execução)
+		ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 		defer cancel()
 
-		// O cron chama o mesmo método do service, passando o contexto
+		// O UpdateManual já possui a cláusula WHERE/CHECK para que só afete/custe se houver dados pendentes (IS NULL)
 		if err := s.UpdateManual(ctx); err != nil {
 			log.Printf("[CRON] Erro ao atualizar política escalonada: %v\n", err)
 		} else {
-			log.Println("[CRON] PCDESCONTO atualizado com sucesso via Cron!")
+			log.Println("[CRON] PCDESCONTO verificado/atualizado com sucesso via Cron!")
 		}
 	})
 
@@ -45,5 +47,5 @@ func (s *service) InitCronJobsUpdateSVC() {
 	}
 
 	cronScheduler.Start()
-	log.Println("[CRON] Agendador de atualização da PCDESCONTO iniciado com sucesso.")
+	log.Println("[CRON] Agendador de atualização da PCDESCONTO iniciado a cada 10 segundos.")
 }

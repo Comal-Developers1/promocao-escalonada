@@ -2,7 +2,8 @@ import axios from "axios";
 
 export const connectDB = () => {
   const api = axios.create({
-    baseURL: "/escalonada-promo/api/api/v1"
+    baseURL: "/escalonada-promo/api/api/v1",
+    //  baseURL: "/dev-test/api/api/v1"
   });
 
   return api;

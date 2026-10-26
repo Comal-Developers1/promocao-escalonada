@@ -44,8 +44,8 @@ export function usePromotionalPricing() {
     const promo = Number(valorPromo.replace(",", "."));
     if (!promo || promo <= 0) return;
 
-    const qInicio = Number(qtdInicio.replace(",", ".")) || 0;
-    const qFim = Number(qtdFim.replace(",", ".")) || 99999;
+    const qInicio = parseFloat(qtdInicio.replace(",", ".")) || 0;
+    const qFim = parseFloat(qtdFim.replace(",", ".")) || 99999;
 
     const novasLinhas: LinhaTabela[] = planos.map((plano) => {
       const valorBaseTabela = getValorTabelaPorNumpr(selecionado, plano.numpr);
@@ -56,7 +56,7 @@ export function usePromotionalPricing() {
         codigo: String(selecionado.codprod),
         descricao: selecionado.descricao,
         valorBase: valorBaseTabela,
-        valorPromocao:  promo,
+        valorPromocao: promo,
         plano: String(plano.codplpag),
         pertxfim: plano.pertxfim || 0,
         valorPlano,
