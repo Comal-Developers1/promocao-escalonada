@@ -31,3 +31,11 @@ func (s *PromocaoSVC) ProductsSVC(c context.Context, filter promocao.ProductFilt
 
 	return products, nil
 }
+
+func (s *PromocaoSVC) PromotionSVC(c context.Context, filter promocao.PromotionFilter) ([]promocao.PromotionDTO, error) {
+	if filter.DtInicio == "" || filter.DtFim == "" {
+		return nil, fmt.Errorf("Datas devem ser obrigatorias")
+	}
+
+	return s.repo.PromotionREPO(c, filter)
+}

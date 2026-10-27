@@ -49,3 +49,26 @@ func (h *HandlerPromotion) GetProducts(c *gin.Context) {
 
 	c.JSON(http.StatusOK, result)
 }
+
+func (h *HandlerPromotion) GetPromotion(c *gin.Context) {
+	var filters promocao.PromotionFilter
+
+	if err := c.ShouldBindQuery(&filters); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Parâmetros ivalidos"})
+		return
+	}
+
+	if filters.DtInicio == "" || filters.DtFim == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data inicio e data fim vazias"})
+		return
+	}
+
+	result, err := h.svc.PromotionSVC(c.Request.Context(), filters)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erro interno no servidor"})
+		log.Printf("Erro ao buscar promoções: %v", err)
+		return
+	}
+
+	c.JSON(200, result)
+}

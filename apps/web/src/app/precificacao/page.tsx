@@ -3,7 +3,8 @@
 import { usePromotionalPricing } from "@/hooks/usePromotionalPricing";
 import { ProductSearchForm } from "@/components/layout/pricing/product-search-form";
 import { PricingTable } from "@/components/layout/pricing/pricing-table";
-import { PromotionHistoryList } from "@/components/layout/pricing/promotion-history-list"; // 🟢 1. Importe o componente
+import { PromotionHistoryList } from "@/components/layout/pricing/promotion-history-list";
+import { PromotionTabsContainer } from "@/components/layout/promotion/promotion-tabs-container";
 
 export default function PrecificacaoPromocionalPage() {
   const {
@@ -32,7 +33,7 @@ export default function PrecificacaoPromocionalPage() {
   } = usePromotionalPricing();
 
   return (
-    <div className="mx-auto max-w-7xl p-6 space-y-6 overflow-visible">
+    <div className="mx-auto max-w-8xl p-5 space-y-6 overflow-visible">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
           Precificação Promocional
@@ -43,36 +44,43 @@ export default function PrecificacaoPromocionalPage() {
         </p>
       </div>
 
-      <ProductSearchForm
-        dataInicio={dataInicio}
-        setDataInicio={setDataInicio}
-        dataFim={dataFim}
-        setDataFim={setDataFim}
-        isDatasPreenchidas={isDatasPreenchidas}
-        termo={termo}
-        setTermo={setTermo}
-        sugestoes={sugestoes}
-        aberto={aberto}
-        setAberto={setAberto}
-        selecionado={selecionado}
-        valorPromo={valorPromo}
-        setValorPromo={setValorPromo}
-        qtdInicio={qtdInicio}
-        setQtdInicio={setQtdInicio}
-        qtdFim={qtdFim}
-        setQtdFim={setQtdFim}
-        selecionarProduto={selecionarProduto}
-        adicionarProduto={adicionarProduto}
+      {/* Componente de Abas Organizado */}
+      <PromotionTabsContainer
+        searchForm={
+          <ProductSearchForm
+            dataInicio={dataInicio}
+            setDataInicio={setDataInicio}
+            dataFim={dataFim}
+            setDataFim={setDataFim}
+            isDatasPreenchidas={isDatasPreenchidas}
+            termo={termo}
+            setTermo={setTermo}
+            sugestoes={sugestoes}
+            aberto={aberto}
+            setAberto={setAberto}
+            selecionado={selecionado}
+            valorPromo={valorPromo}
+            setValorPromo={setValorPromo}
+            qtdInicio={qtdInicio}
+            setQtdInicio={setQtdInicio}
+            qtdFim={qtdFim}
+            setQtdFim={setQtdFim}
+            selecionarProduto={selecionarProduto}
+            adicionarProduto={adicionarProduto}
+          />
+        }
+        pricingTable={
+          <div className="space-y-6">
+            <PricingTable
+              linhas={linhas}
+              removerProduto={removerProduto}
+              isLoading={isLoading}
+            />
+            {/* 🟢 Histórico de arquivos baixados mantido na aba de criação */}
+            <PromotionHistoryList />
+          </div>
+        }
       />
-
-      <PricingTable
-        linhas={linhas}
-        removerProduto={removerProduto}
-        isLoading={isLoading}
-      />
-
-      {/* 🟢 2. Insira o componente de histórico logo abaixo */}
-      <PromotionHistoryList />
     </div>
   );
 }

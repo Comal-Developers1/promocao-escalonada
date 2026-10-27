@@ -12,3 +12,6 @@ var ProductsQuery string
 
 //go:embed update/update.sql
 var UpdateQuery string
+
+//go:embed promocao/promo.sql
+var PromotionQuery string

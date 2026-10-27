@@ -40,3 +40,18 @@ export interface PaymentPlans {
   pertxfim: number;
   numpr: number;
 }
+
+export interface PromotionDTO {
+  descricao: string;
+  dtinicio: string;
+  dtfim: string;
+  codprod: number;
+  produto: string;
+  qtminima: number;
+  preco: number;
+}
+
+export type PromotionFilter = {
+  dtinicio: string;
+  dtfim: string;
+};
