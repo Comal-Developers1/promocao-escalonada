@@ -40,3 +40,16 @@ func (r *PromocaoRepo) ProductsREPO(c context.Context, filter promocao.ProductFi
 
 	return products, nil
 }
+
+func (r *PromocaoRepo) PromotionREPO(c context.Context, filter promocao.PromotionFilter) ([]promocao.PromotionDTO, error) {
+	query := db.PromotionQuery
+	var promotions []promocao.PromotionDTO
+
+	err := r.oracleDB.WithContext(c).Raw(query, filter.DtInicio, filter.DtFim).Scan(&promotions).Error
+
+	if err != nil {
+		return make([]promocao.PromotionDTO, 0), err
+	}
+
+	return promotions, nil
+}

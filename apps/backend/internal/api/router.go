@@ -11,6 +11,7 @@ func SetupRoutes(r *gin.Engine, pay handler.HandlerPromotion, txt *handler.Handl
 	v2 := v1.Group("/promotion")
 	v2.GET("/payment-plans", pay.GetPaymentPlan)
 	v2.GET("/products", pay.GetProducts)
+	v2.GET("/get", pay.GetPromotion)
 	v2.GET("/update", update.UpdatePCDESCONTO)
 
 	v3 := v2.Group("/file")
