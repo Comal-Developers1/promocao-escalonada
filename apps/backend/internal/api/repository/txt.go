@@ -1,6 +1,9 @@
 package repository
 
 import (
+	"context"
+	"time"
+
 	promotiontxt "github.com/Comal-Developers1/promocao-escalonada.git/internal/api/domain/promotion-txt"
 	"gorm.io/gorm"
 )
@@ -20,16 +23,31 @@ func (r *promotionSaveRepositoy) SaveHistory(promo *promotiontxt.Promocao) error
 	return nil
 }
 
-func (r *promotionSaveRepositoy) ListHistory(matricula int) ([]promotiontxt.Promocao, error) {
+func (r *promotionSaveRepositoy) ListHistory(c context.Context, filter promotiontxt.PromocaoHistoryFilter) ([]promotiontxt.Promocao, error) {
 	var promocoes []promotiontxt.Promocao
 
 	query := r.db.Preload("Itens").Order("criado_em DESC")
 
-	// Se passar matrícula, filtra por ela. Se for 0, pode retornar tudo ou ajustar conforme regra.
-	if matricula > 0 {
-		query = query.Where("matricula = ?", matricula)
+	if filter.Matricula > 0 {
+		query = query.Where("matricula = ?", filter.Matricula)
 	}
 
+	// Filtra a partir da data inicial (se informada)
+	if filter.DataInicio != nil {
+		query = query.Where("criado_em >= ?", &filter.DataInicio)
+	}
+
+	if filter.DataFim != nil {
+		// 🟢 Define o final do dia (23:59:59) para a data de fim
+		dataFimAjustada := time.Date(
+			filter.DataFim.Year(),
+			filter.DataFim.Month(),
+			filter.DataFim.Day(),
+			23, 59, 59, 999999999,
+			filter.DataFim.Location(),
+		)
+		query = query.Where("criado_em <= ?", dataFimAjustada)
+	}
 	if err := query.Find(&promocoes).Error; err != nil {
 		return nil, err
 	}

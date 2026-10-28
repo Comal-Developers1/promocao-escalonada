@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"log"
 	"net/http"
 
@@ -54,18 +53,32 @@ func (h *HandlerTXT) ExportTXT(c *gin.Context) {
 }
 
 func (h *HandlerTXT) GetHistory(c *gin.Context) {
-	// Exemplo lendo da query string opcionalmente, ou da session/contexto
-	matriculaStr := c.Query("matricula")
-	var matricula int
-	if matriculaStr != "" {
-		fmt.Sscanf(matriculaStr, "%d", &matricula)
-	} else {
-		// Ou pega da session/contexto se preferir filtrar pelo usuário logado
-		matricula = c.GetInt("matricula")
+	var filter promotiontxt.PromocaoHistoryFilter
+
+	// Faz o bind dos parâmetros da query string (?matricula=...&data_inicio=...&data_fim=...) para a struct
+	if err := c.ShouldBindQuery(&filter); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "parâmetros inválidos: " + err.Error()})
+		return
 	}
 
-	historico, err := h.svc.GetHistory(matricula)
+	// Se a matrícula não veio na query string, tenta pegar do contexto/sessão
+	if filter.Matricula == 0 {
+		if val, exists := c.Get("matricula"); exists {
+			if m, ok := val.(int); ok {
+				filter.Matricula = m
+			}
+		}
+	}
+
+	// Passa o contexto da requisição (c.Request.Context()) e o filtro para o Service
+	historico, err := h.svc.GetHistory(c.Request.Context(), filter)
 	if err != nil {
+		// Se for o erro de validação que você definiu no service, retorna 400
+		if err.Error() == "matricula, datainico e datafim são obrigatorios" {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
 		log.Printf("[GetHistory Error]: %v", err)
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "erro ao buscar histórico de promoções"})
 		return

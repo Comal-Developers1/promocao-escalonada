@@ -40,9 +40,15 @@ export async function exportarTxtPromocao(
 
 export async function buscarHistoricoPromocao(
   matricula: number,
+  dataInicio?: string,
+  dataFim?: string,
 ): Promise<PromocaoHistorico[]> {
   const response = await api.get("/promotion/file/history", {
-    params: { matricula },
+    params: {
+      matricula,
+      data_inicio: dataInicio || undefined,
+      data_fim: dataFim || undefined,
+    },
   });
   return response.data;
 }

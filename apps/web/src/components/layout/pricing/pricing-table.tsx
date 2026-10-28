@@ -121,9 +121,6 @@ export function PricingTable({
               <TableRow>
                 <TableHead>Código</TableHead>
                 <TableHead>Descrição</TableHead>
-                <TableHead className="text-right">
-                  Valor base (Tabela)
-                </TableHead>
                 <TableHead className="text-right">Valor promo</TableHead>
                 <TableHead className="text-center">QT. Inicial</TableHead>
                 <TableHead className="text-right">Taxa/Desc. Plano</TableHead>
@@ -192,10 +189,6 @@ export function PricingTable({
                           </TableCell>
 
                           <TableCell className="pb-3">{l.descricao}</TableCell>
-
-                          <TableCell className="text-right">
-                            {fmtBRL(l.valorBase)}
-                          </TableCell>
 
                           <TableCell className="text-right font-semibold">
                             {fmtBRL(l.valorPromocao)}
