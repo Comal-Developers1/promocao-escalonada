@@ -61,16 +61,12 @@ export function ProductSearchForm({
 
   // 1. Restauração ao carregar a página
   React.useEffect(() => {
-    const savedDataInicio = localStorage.getItem("promo_dataInicio");
-    const savedDataFim = localStorage.getItem("promo_dataFim");
     const savedQtdInicio = localStorage.getItem("promo_qtdInicio");
     const savedQtdFim = localStorage.getItem("promo_qtdFim");
     const savedTermo = localStorage.getItem("promo_termo");
     const savedValorPromo = localStorage.getItem("promo_valorPromo");
     const savedSelecionado = localStorage.getItem("promo_selecionado");
 
-    if (savedDataInicio) setDataInicio(savedDataInicio);
-    if (savedDataFim) setDataFim(savedDataFim);
     if (savedQtdInicio) setQtdInicio(savedQtdInicio);
     if (savedQtdFim) setQtdFim(savedQtdFim);
     if (savedTermo) setTermo(savedTermo);
@@ -91,12 +87,6 @@ export function ProductSearchForm({
 
   // 2. Salva os campos simples no localStorage
   React.useEffect(() => {
-    if (dataInicio) localStorage.setItem("promo_dataInicio", dataInicio);
-    else localStorage.removeItem("promo_dataInicio");
-
-    if (dataFim) localStorage.setItem("promo_dataFim", dataFim);
-    else localStorage.removeItem("promo_dataFim");
-
     if (qtdInicio) localStorage.setItem("promo_qtdInicio", qtdInicio);
     else localStorage.removeItem("promo_qtdInicio");
 
@@ -139,8 +129,6 @@ export function ProductSearchForm({
     setQtdFim("99999");
     if (setSelecionado) setSelecionado(null);
 
-    localStorage.removeItem("promo_dataInicio");
-    localStorage.removeItem("promo_dataFim");
     localStorage.removeItem("promo_qtdInicio");
     localStorage.removeItem("promo_qtdFim");
     localStorage.removeItem("promo_termo");
@@ -278,10 +266,7 @@ export function ProductSearchForm({
                       e.preventDefault();
                       const produtoParaSelecionar = sugestoes[0];
                       if (produtoParaSelecionar) {
-                        selecionarProduto(produtoParaSelecionar);
-                        setTermo(
-                          `${produtoParaSelecionar.codprod} - ${produtoParaSelecionar.descricao}`,
-                        );
+                        selecionarProduto(produtoParaSelecionar); // Já cuida do termo e do estado!
                         setAberto(false);
                       }
                     } else if (e.key === "Enter") {
@@ -319,8 +304,7 @@ export function ProductSearchForm({
                           className="cursor-pointer px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground flex items-center justify-between"
                           onMouseDown={(e) => e.preventDefault()}
                           onClick={() => {
-                            selecionarProduto(p);
-                            setTermo(`${p.codprod} - ${p.descricao}`);
+                            selecionarProduto(p); // Já cuida do termo e do estado!
                             setAberto(false);
                           }}
                         >

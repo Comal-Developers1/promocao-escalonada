@@ -38,6 +38,12 @@ func (Promocao) TableName() string {
 	return "promocoes"
 }
 
+type PromocaoHistoryFilter struct {
+	Matricula  int        `json:"matricula" form:"matricula"`
+	DataInicio *time.Time `json:"data_inicio" form:"data_inicio" time_format:"2006-01-02"`
+	DataFim    *time.Time `json:"data_fim" form:"data_fim" time_format:"2006-01-02"`
+}
+
 type PromocaoItem struct {
 	ID               uint      `gorm:"primaryKey;column:id" json:"id"`
 	PromocaoID       uint      `gorm:"column:promocao_id" json:"promocaoId"`

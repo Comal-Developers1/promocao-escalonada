@@ -2,6 +2,7 @@ package service
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"strings"
 
@@ -113,6 +114,9 @@ func (s *TXTService) GenerateAndSaveTXT(usuario string, matricula int, linhas []
 	return buffer.Bytes(), nil
 }
 
-func (s *TXTService) GetHistory(matricula int) ([]promotiontxt.Promocao, error) {
-	return s.repo.ListHistory(matricula)
+func (s *TXTService) GetHistory(c context.Context, filter promotiontxt.PromocaoHistoryFilter) ([]promotiontxt.Promocao, error) {
+	if filter.Matricula == 0 || filter.DataInicio == nil || filter.DataFim == nil {
+		return nil, fmt.Errorf("matricula, datainico e datafim são obrigatorios")
+	}
+	return s.repo.ListHistory(c, filter)
 }
